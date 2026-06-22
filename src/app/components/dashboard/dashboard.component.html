@@ -1,0 +1,113 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back! Here's your salary overview.</p>
+    </div>
+    <a routerLink="/salaries/new" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Add Employee
+    </a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Employees</span>
+        <span class="stat-value">{{ getTotalSalaries() }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Payroll</span>
+        <span class="stat-value">{{ formatCurrency(getTotalAmount()) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M2 12h20"/>
+          <circle cx="12" cy="12" r="4"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Average Salary</span>
+        <span class="stat-value">{{ formatCurrency(getAverageSalary()) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 12V8h-4a4 4 0 0 0 0 8h4v4"/>
+          <path d="M4 12v-4h4a4 4 0 0 1 0 8H4v-4"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Bonus</span>
+        <span class="stat-value">{{ formatCurrency(getTotalBonus()) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="recent-section">
+      <div class="section-header">
+        <h2>Recent Salaries</h2>
+        <a routerLink="/salaries" class="link">View All</a>
+      </div>
+
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <div *ngIf="!loading && salaries.length === 0" class="empty-state">
+        <p>No salary records found.</p>
+      </div>
+
+      <div *ngIf="!loading && salaries.length > 0" class="recent-list">
+        <div *ngFor="let salary of salaries.slice(0, 5)" class="recent-item">
+          <div class="employee-info">
+            <div class="avatar">{{ salary.employeeName.charAt(0).toUpperCase() }}</div>
+            <div class="details">
+              <span class="name">{{ salary.employeeName }}</span>
+              <span class="position">Employee</span>
+            </div>
+          </div>
+          <div class="salary-info">
+            <span class="amount">{{ formatCurrency(salary.netSalary || 0) }}</span>
+            <span class="label">Net Salary</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-earners">
+      <h2>Top Earners</h2>
+      <div class="top-list">
+        <ng-container *ngFor="let salary of getTopEarners(); let i = index">
+          <div class="top-item">
+            <span class="rank">{{ i + 1 }}</span>
+            <span class="name">{{ salary.employeeName }}</span>
+            <span class="amount">{{ formatCurrency(salary.netSalary || 0) }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

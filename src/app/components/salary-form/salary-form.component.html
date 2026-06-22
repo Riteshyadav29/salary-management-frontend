@@ -1,0 +1,108 @@
+<div class="container">
+  <div class="form-header">
+    <button (click)="cancel()" class="btn-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to List
+    </button>
+    <h1 class="page-title">{{ isEditMode ? 'Edit Salary' : 'Add New Employee' }}</h1>
+    <p class="page-subtitle">{{ isEditMode ? 'Update employee salary information' : 'Enter employee salary details' }}</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div class="form-container">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-card">
+        <div class="form-group">
+          <label for="employeeName">Employee Name</label>
+          <input
+            type="text"
+            id="employeeName"
+            formControlName="employeeName"
+            class="form-control"
+            [class.is-invalid]="hasError('employeeName', 'required') || hasError('employeeName', 'minlength')"
+            placeholder="Enter employee name"
+          >
+          <div *ngIf="hasError('employeeName', 'required')" class="error-message">
+            Employee name is required
+          </div>
+          <div *ngIf="hasError('employeeName', 'minlength')" class="error-message">
+            Name must be at least 2 characters
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="baseSalary">Base Salary (₹)</label>
+            <input
+              type="number"
+              id="baseSalary"
+              formControlName="baseSalary"
+              class="form-control"
+              [class.is-invalid]="hasError('baseSalary', 'required') || hasError('baseSalary', 'min')"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            >
+            <div *ngIf="hasError('baseSalary', 'required')" class="error-message">
+              Base salary is required
+            </div>
+            <div *ngIf="hasError('baseSalary', 'min')" class="error-message">
+              Base salary cannot be negative
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bonus">Bonus (₹)</label>
+            <input
+              type="number"
+              id="bonus"
+              formControlName="bonus"
+              class="form-control"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="deductions">Deductions (₹)</label>
+            <input
+              type="number"
+              id="deductions"
+              formControlName="deductions"
+              class="form-control"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Net Salary (₹)</label>
+            <div class="net-salary-display">
+              {{ formatCurrency(calculatedNetSalary) }}
+            </div>
+            <span class="net-salary-hint">Automatically calculated</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancel()" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-small"></span>
+          {{ isEditMode ? 'Update Employee' : 'Add Employee' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

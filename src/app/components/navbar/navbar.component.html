@@ -1,0 +1,15 @@
+<nav class="navbar" *ngIf="isLoggedIn()">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      <a routerLink="/dashboard" class="nav-title">Salary Management</a>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
+      <a routerLink="/salaries" routerLinkActive="active" class="nav-link">Salaries</a>
+      <button (click)="logout()" class="nav-link btn-logout">Logout</button>
+    </div>
+  </div>
+</nav>

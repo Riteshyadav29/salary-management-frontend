@@ -1,0 +1,145 @@
+<div class="container">
+  <div class="header">
+    <div>
+      <h1 class="page-title">Employee Salaries</h1>
+      <p class="page-subtitle">Manage employee salary records</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-secondary" (click)="exportCsv()" [disabled]="exporting || loading">
+        {{ exporting ? 'Exporting...' : 'Export CSV' }}
+      </button>
+      <a routerLink="/salaries/new" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add Employee
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="field field-search">
+        <label for="search">Search Employee</label>
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="filters.search"
+          (keyup.enter)="applyFilters()"
+          placeholder="Type employee name"
+        />
+      </div>
+
+      <div class="field">
+        <label for="minBaseSalary">Min Base Salary</label>
+        <input id="minBaseSalary" type="number" min="0" [(ngModel)]="filters.minBaseSalary" placeholder="0" />
+      </div>
+
+      <div class="field">
+        <label for="maxBaseSalary">Max Base Salary</label>
+        <input id="maxBaseSalary" type="number" min="0" [(ngModel)]="filters.maxBaseSalary" placeholder="500000" />
+      </div>
+
+      <div class="field">
+        <label for="minNetSalary">Min Net Salary</label>
+        <input id="minNetSalary" type="number" min="0" [(ngModel)]="filters.minNetSalary" placeholder="0" />
+      </div>
+
+      <div class="field">
+        <label for="maxNetSalary">Max Net Salary</label>
+        <input id="maxNetSalary" type="number" min="0" [(ngModel)]="filters.maxNetSalary" placeholder="500000" />
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <button type="button" class="btn btn-primary" (click)="applyFilters()">Apply Filters</button>
+      <button type="button" class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading salaries...</p>
+  </div>
+
+  <div *ngIf="!loading && salaries.length === 0" class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <h3>No salary records found</h3>
+    <p>Get started by adding your first employee salary record.</p>
+    <a routerLink="/salaries/new" class="btn btn-primary">Add First Employee</a>
+  </div>
+
+  <div *ngIf="!loading && salaries.length > 0" class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="changeSort('employeeName')">Employee Name {{ getSortIndicator('employeeName') }}</th>
+          <th class="text-right sortable" (click)="changeSort('baseSalary')">Base Salary {{ getSortIndicator('baseSalary') }}</th>
+          <th class="text-right">Bonus</th>
+          <th class="text-right">Deductions</th>
+          <th class="text-right sortable" (click)="changeSort('netSalary')">Net Salary {{ getSortIndicator('netSalary') }}</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let salary of salaries">
+          <td class="employee-name">{{ salary.employeeName }}</td>
+          <td class="text-right">{{ formatCurrency(salary.baseSalary) }}</td>
+          <td class="text-right bonus">{{ formatCurrency(salary.bonus) }}</td>
+          <td class="text-right deductions">{{ formatCurrency(salary.deductions) }}</td>
+          <td class="text-right net-salary">{{ formatCurrency(salary.netSalary || 0) }}</td>
+          <td class="text-center">
+            <div class="actions">
+              <button (click)="editSalary(salary.id!)" class="btn-icon" title="Edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button *ngIf="deleteConfirmId !== salary.id" (click)="confirmDelete(salary.id!)" class="btn-icon btn-icon-danger" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+              <div *ngIf="deleteConfirmId === salary.id" class="confirm-delete">
+                <span>Delete?</span>
+                <button (click)="deleteSalary(salary.id!)" class="btn-icon btn-icon-danger">Yes</button>
+                <button (click)="cancelDelete()" class="btn-icon">No</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-bar">
+      <div class="pagination-summary">
+        Showing {{ getPageStart() }}-{{ getPageEnd() }} of {{ totalElements }}
+      </div>
+
+      <div class="pagination-controls">
+        <label for="pageSize">Rows:</label>
+        <select id="pageSize" [value]="size" (change)="onPageSizeChange($event)">
+          <option *ngFor="let pageSize of pageSizeOptions" [value]="pageSize">{{ pageSize }}</option>
+        </select>
+
+        <button type="button" class="btn btn-secondary btn-sm" (click)="goToPreviousPage()" [disabled]="page === 0">
+          Prev
+        </button>
+        <span class="page-indicator">Page {{ page + 1 }} of {{ totalPages || 1 }}</span>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="goToNextPage()" [disabled]="page + 1 >= totalPages">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

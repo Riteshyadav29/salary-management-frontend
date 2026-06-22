@@ -1,0 +1,55 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <h1>{{ isRegisterMode ? 'Create Account' : 'Welcome Back' }}</h1>
+      <p>{{ isRegisterMode ? 'Start managing salaries' : 'Sign in to continue' }}</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Username</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="form-control"
+          placeholder="Enter username"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Enter password"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <span *ngIf="loading" class="spinner"></span>
+        {{ isRegisterMode ? 'Create Account' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p *ngIf="!isRegisterMode">
+        Don't have an account?
+        <button type="button" (click)="toggleMode()" class="link">Register</button>
+      </p>
+      <p *ngIf="isRegisterMode">
+        Already have an account?
+        <button type="button" (click)="toggleMode()" class="link">Sign In</button>
+      </p>
+    </div>
+  </div>
+</div>
